@@ -6,8 +6,8 @@ from fastapi import APIRouter, Request
 
 from app.access import AccessStore
 from app.authn import require_faculty_scope, require_roles, require_user
-from app.bookings import BookingStore, lookup_equipment
-from app.models import RecordId, ResourceKind, Role
+from app.bookings import BookingStore, lookup_equipment, to_booking_view
+from app.models import RecordId, Role
 from app.schemas import (
     OfferView,
     PromoteBody,
@@ -238,18 +238,4 @@ def post_waitlist_accept(request: Request, entry_id: RecordId) -> BookingView:
         entry_id=entry_id,
         now=now,
     )
-    catalog = read_catalog(request.app.state)
-    item = next((row for row in catalog.equipment if row.id == booking.equipment_id), None)
-    return BookingView(
-        id=booking.id,
-        equipment_id=booking.equipment_id,
-        equipment_name=item.name if item is not None else booking.equipment_id,
-        kind=item.kind if item is not None else ResourceKind.EQUIPMENT,
-        project_id=booking.project_id,
-        purpose=booking.purpose,
-        start=booking.start,
-        end=booking.end,
-        status=booking.status,
-        user_id=booking.user_id,
-        demo=True,
-    )
+    return to_booking_view(booking, read_catalog(request.app.state))

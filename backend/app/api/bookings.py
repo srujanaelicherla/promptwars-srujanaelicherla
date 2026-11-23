@@ -13,8 +13,9 @@ from app.bookings import (
     lookup_equipment,
     resolve_project_id,
     subtract_busy,
+    to_booking_view,
 )
-from app.models import Booking, RecordId, ResourceKind, Role
+from app.models import RecordId, Role
 from app.schemas import (
     AvailabilityResponse,
     BookingCreate,
@@ -48,23 +49,6 @@ def _access(request: Request) -> AccessStore:
     if not isinstance(store, AccessStore):
         raise RuntimeError("Application access store is not configured")
     return store
-
-
-def _view(booking: Booking, catalog) -> BookingView:
-    item = next((row for row in catalog.equipment if row.id == booking.equipment_id), None)
-    return BookingView(
-        id=booking.id,
-        equipment_id=booking.equipment_id,
-        equipment_name=item.name if item is not None else booking.equipment_id,
-        kind=item.kind if item is not None else ResourceKind.EQUIPMENT,
-        project_id=booking.project_id,
-        purpose=booking.purpose,
-        start=booking.start,
-        end=booking.end,
-        status=booking.status,
-        user_id=booking.user_id,
-        demo=True,
-    )
 
 
 @router.get("/equipment/{equipment_id}/availability", response_model=AvailabilityResponse)
@@ -122,7 +106,7 @@ def create_booking(request: Request, body: BookingCreate) -> BookingView:
         user_id=actor.id,
         purpose=body.purpose,
     )
-    return _view(booking, catalog)
+    return to_booking_view(booking, catalog)
 
 
 @router.post("/bookings/{booking_id}/cancel", response_model=BookingView)
@@ -140,7 +124,7 @@ def cancel_booking(request: Request, booking_id: RecordId) -> BookingView:
         actor=actor,
         now=now,
     )
-    return _view(booking, read_catalog(request.app.state))
+    return to_booking_view(booking, read_catalog(request.app.state))
 
 
 @router.get("/bookings", response_model=BookingListResponse)
@@ -149,7 +133,7 @@ def list_bookings(request: Request) -> BookingListResponse:
     items = _store(request).for_user(actor.id)
     items.sort(key=lambda item: (item.start, item.id))
     return BookingListResponse(
-        items=[_view(item, read_catalog(request.app.state)) for item in items],
+        items=[to_booking_view(item, read_catalog(request.app.state)) for item in items],
         demo_user_id=actor.id,
         source="synthetic",
         demo=True,

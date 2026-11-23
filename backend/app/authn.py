@@ -26,13 +26,18 @@ class TokenVerifier(Protocol):
 class FirebaseTokenVerifier:
     def verify(self, token: str) -> dict[str, str]:
         from firebase_admin import auth
-        from firebase_admin.auth import ExpiredIdTokenError, InvalidIdTokenError, RevokedIdTokenError
+        from firebase_admin.auth import (
+            ExpiredIdTokenError,
+            InvalidIdTokenError,
+            RevokedIdTokenError,
+            UserNotFoundError,
+        )
 
         try:
             decoded = auth.verify_id_token(token, check_revoked=True)
         except ExpiredIdTokenError as exc:
             raise BookingError(401, "unauthorized", "The session has expired.") from exc
-        except (InvalidIdTokenError, RevokedIdTokenError) as exc:
+        except (InvalidIdTokenError, RevokedIdTokenError, UserNotFoundError) as exc:
             raise BookingError(401, "unauthorized", "The credential is invalid.") from exc
         except Exception as exc:
             logger.info("Token verification failed: %s", type(exc).__name__)

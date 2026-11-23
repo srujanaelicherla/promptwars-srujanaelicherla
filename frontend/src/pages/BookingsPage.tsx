@@ -26,7 +26,6 @@ export function BookingsPage() {
   const [waitlist, setWaitlist] = useState<WaitlistView[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [waitlistError, setWaitlistError] = useState<string | null>(null);
-  const [, setDemoUser] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [cancelMessage, setCancelMessage] = useState<string | null>(null);
   const { profile } = useAuth();
@@ -35,7 +34,6 @@ export function BookingsPage() {
     listBookings()
       .then((result) => {
         setItems(result.items);
-        setDemoUser(result.demo_user_id);
         setError(null);
       })
       .catch((caught: unknown) => {

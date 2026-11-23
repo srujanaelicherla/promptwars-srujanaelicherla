@@ -54,6 +54,9 @@ export function EquipmentPage() {
     };
   }, [search, department, category, status, kind]);
 
+  const visible =
+    items === null ? null : kind ? items.filter((item) => resourceKind(item) === kind) : items;
+
   function update(next: Record<string, string>) {
     const merged = new URLSearchParams(params);
     for (const [key, value] of Object.entries(next)) {
@@ -159,16 +162,16 @@ export function EquipmentPage() {
       <div className="mt-6">
         {error ? (
           <ErrorState title="Equipment unavailable" message={error} />
-        ) : items === null ? (
+        ) : visible === null ? (
           <LoadingState label="Loading equipment" />
-        ) : (kind ? items.filter((item) => resourceKind(item) === kind) : items).length === 0 ? (
+        ) : visible.length === 0 ? (
           <EmptyState
             title="No matching items"
             description="Nothing in the catalog matches these filters."
           />
         ) : (
           <ul className="grid list-none gap-4 p-0 md:grid-cols-2">
-            {(kind ? items.filter((item) => resourceKind(item) === kind) : items).map((item) => (
+            {visible.map((item) => (
               <li key={item.id}>
                 <EquipmentCard equipment={item} />
               </li>

@@ -25,6 +25,9 @@ __pycache__/
 .env.*
 !.env.example
 
+# Firebase CLI local cache
+.firebase/
+
 # Logs
 *.log
 

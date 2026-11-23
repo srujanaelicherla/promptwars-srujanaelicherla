@@ -11,8 +11,8 @@ from datetime import date, datetime, timedelta, timezone
 from threading import Lock
 from uuid import uuid4
 
-from app.models import Booking, BookingStatus, Equipment, EquipmentStatus, Project, Role, User
-from app.schemas import ErrorCode
+from app.models import Booking, BookingStatus, Equipment, EquipmentStatus, Project, ResourceKind, Role, User
+from app.schemas import BookingView, ErrorCode
 from app.seed import Catalog
 from app.slots import SLOT, slot_keys
 
@@ -287,3 +287,20 @@ def resolve_project_id(catalog: Catalog, equipment: Equipment, project_id: str |
     if catalog.projects:
         return catalog.projects[0].id
     raise BookingError(422, "invalid_request", "No project is available for this booking.")
+
+
+def to_booking_view(booking: Booking, catalog: Catalog) -> BookingView:
+    item = next((row for row in catalog.equipment if row.id == booking.equipment_id), None)
+    return BookingView(
+        id=booking.id,
+        equipment_id=booking.equipment_id,
+        equipment_name=item.name if item is not None else booking.equipment_id,
+        kind=item.kind if item is not None else ResourceKind.EQUIPMENT,
+        project_id=booking.project_id,
+        purpose=booking.purpose,
+        start=booking.start,
+        end=booking.end,
+        status=booking.status,
+        user_id=booking.user_id,
+        demo=True,
+    )
