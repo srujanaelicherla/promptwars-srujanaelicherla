@@ -1,6 +1,10 @@
-# Cloud Run service notes (TEMPLATE ONLY).
+# UNUSED. LabLink's supported API host is Render (see docs/PHASE12_DEPLOYMENT.md).
+# This Cloud Run template is kept only as a historical file. Do not deploy it.
+# Do not use Artifact Registry, Cloud Build, Cloud Run, or Secret Manager for this API.
+#
+# Cloud Run service notes (TEMPLATE ONLY, unused).
 # Replace YOUR_PROJECT_ID, YOUR_REGION, YOUR_AR_REPO, YOUR_SERVICE_ACCOUNT.
-# Do not apply this file until a real GCP project exists. This phase did not deploy.
+# Do not apply this file.
 
 # Suggested (not executed):
 #   gcloud run services replace deploy/cloudrun.service.yaml --region YOUR_REGION

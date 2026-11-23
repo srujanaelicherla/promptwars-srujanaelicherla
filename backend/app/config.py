@@ -52,8 +52,14 @@ def _persistence(auth_mode: AuthMode) -> Persistence:
     return "memory"
 
 
+_FIREBASE_HOSTING_ORIGINS = (
+    "https://lablink-6f3a6.web.app",
+    "https://lablink-6f3a6.firebaseapp.com",
+)
+
+
 def _cors_origins() -> tuple[str, ...]:
-    """Local Vite origins only when LABLINK_CORS_ORIGINS is unset. * is never allowed."""
+    """Local Vite origins when LABLINK_CORS_ORIGINS is unset. Hosting origins always stay allowed. * is never allowed."""
 
     extra = os.environ.get("LABLINK_CORS_ORIGINS", "")
     added: list[str] = []
@@ -64,7 +70,7 @@ def _cors_origins() -> tuple[str, ...]:
         if origin.startswith("http://") or origin.startswith("https://"):
             added.append(origin)
     if added:
-        return tuple(dict.fromkeys(added))
+        return tuple(dict.fromkeys([*added, *_FIREBASE_HOSTING_ORIGINS]))
     return (
         "http://127.0.0.1:5173",
         "http://localhost:5173",
@@ -72,6 +78,7 @@ def _cors_origins() -> tuple[str, ...]:
         "http://localhost:5174",
         "http://127.0.0.1:4173",
         "http://localhost:4173",
+        *_FIREBASE_HOSTING_ORIGINS,
     )
 
 

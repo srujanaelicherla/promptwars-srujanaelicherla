@@ -78,3 +78,11 @@ def test_configured_origins_do_not_keep_localhost(monkeypatch) -> None:
     )
     assert allowed.headers.get("access-control-allow-origin") == "https://lablink.example"
     assert "access-control-allow-origin" not in local.headers
+    hosting = client.options(
+        "/health",
+        headers={
+            "Origin": "https://lablink-6f3a6.web.app",
+            "Access-Control-Request-Method": "GET",
+        },
+    )
+    assert hosting.headers.get("access-control-allow-origin") == "https://lablink-6f3a6.web.app"

@@ -1,6 +1,7 @@
 # LabLink API image. Build from the repository root.
+# Supported host: Render free Web Service (Docker). Cloud Run is unused.
 # Do not bake GEMINI_API_KEY, service-account JSON, or test auth into the image.
-# Secrets belong in Secret Manager / Cloud Run env at deploy time (not done in this phase).
+# Set those as Render environment variables or secret files in the dashboard.
 
 FROM python:3.12-slim-bookworm
 
@@ -26,5 +27,5 @@ ENV LABLINK_ENV=production \
 
 EXPOSE 8080
 
-# Cloud Run sets PORT. Bind 0.0.0.0. No --reload. Docs/ReDoc stay disabled in app.main.
+# Render (and similar) set PORT. Bind 0.0.0.0. No --reload. Docs/ReDoc stay disabled in app.main.
 CMD ["sh", "-c", "python -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT}"]

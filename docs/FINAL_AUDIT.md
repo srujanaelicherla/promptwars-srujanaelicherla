@@ -17,7 +17,7 @@ Core laboratory workflows are implemented and tested locally, including atomic F
 | Efficiency | Acceptable | Auth-only Firebase client; JS rebuild after dep change; analytics still full snapshots |
 | Testing | Strong API | Pytest twice after Phase 12 edits; emulator decide races; vitest; no browser E2E (no Playwright/computer-use) |
 | Accessibility | Partial | Phase 10/11 shell work; no axe/browser pass this phase |
-| Alignment | Partial | Booking/matching/approvals/waitlist/analytics exist; GenAI and Cloud Run undemonstrated |
+| Alignment | Partial | Booking/matching/approvals/waitlist/analytics exist; GenAI and Render undemonstrated |
 
 ## C. Defects
 
@@ -26,7 +26,7 @@ Core laboratory workflows are implemented and tested locally, including atomic F
 | P11-006 | High | **Resolved** | `FirestoreAccessStore._decide_in_transaction`: request + approval + slot locks in one txn; reads before writes; slot conflict leaves request pending. Emulator tests 200/409 |
 | P11-007 | High | **Resolved in tree** | `firebase@11.10.0` → `@firebase/firestore@4.8.0` → `@grpc/grpc-js@1.9.16` (4 high). Code imported only `firebase/auth`. Replaced with `@firebase/app@0.13.2` + `@firebase/auth@1.10.8` (same versions firebase 11.10.0 already used). `npm ls @grpc/grpc-js` empty. `npm audit --omit=dev`: 0. Did **not** run `npm audit fix --force`. Did **not** jump to firebase 13 (major) |
 | P11-005 | High | Unresolved | No `GEMINI_API_KEY`; `/ai/*` 503; live pytest skipped |
-| P11-010 | High | Config only | Dockerfile + Cloud Run template + Hosting rewrites. **Not deployed** |
+| P11-010 | High | Config only | Dockerfile + Render Web Service + Hosting rewrites. Cloud Run YAML unused. **Not deployed** |
 | P11-013 | High | Unresolved | `VITE_FIREBASE_*` empty; browser auth UNVERIFIED |
 | P11-008 | Medium | Unresolved | Analytics `snapshot()` unbounded |
 | P11-009 | Medium | Unresolved | No WCAG/browser audit |
@@ -55,9 +55,9 @@ FULL only where tests/HTTP in this repo support it.
 
 | Risk | Mitigation left to the user |
 | --- | --- |
-| Submit without Cloud Run URL | Deploy per `docs/PHASE12_DEPLOYMENT.md` |
-| Submit without Gemini | Secret Manager `GEMINI_API_KEY` |
-| `LABLINK_AUTH_MODE=test` on Cloud Run | Image defaults firebase + `LABLINK_ENV=production` refuse test/memory |
+| Submit without Render URL | Deploy per `docs/PHASE12_DEPLOYMENT.md` |
+| Submit without Gemini | Render env `GEMINI_API_KEY` |
+| `LABLINK_AUTH_MODE=test` on Render | Image defaults firebase + `LABLINK_ENV=production` refuse test/memory |
 | Copying emulator data to prod | Do not; seed explicitly |
 | Browser auth untested here | Configure `VITE_FIREBASE_*` and walk register/sign-in |
 

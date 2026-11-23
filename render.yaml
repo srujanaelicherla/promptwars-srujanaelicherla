@@ -1,0 +1,23 @@
+# Render Blueprint. Not applied from this workspace. Create the Web Service in the dashboard.
+services:
+  - type: web
+    name: lablink-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: LABLINK_ENV
+        value: production
+      - key: LABLINK_AUTH_MODE
+        value: firebase
+      - key: LABLINK_PERSISTENCE
+        value: firestore
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: LABLINK_CORS_ORIGINS
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GOOGLE_APPLICATION_CREDENTIALS
+        sync: false
