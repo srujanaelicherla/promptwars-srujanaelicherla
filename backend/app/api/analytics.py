@@ -6,7 +6,7 @@ from fastapi import APIRouter, Query, Request
 
 from app.access import AccessStore
 from app.analytics import build_departments, build_equipment, build_overview, parse_window
-from app.authn import require_roles, require_user
+from app.authn import require_user
 from app.bookings import BookingError, BookingStore
 from app.models import Role
 from app.schemas import AnalyticsOverview, DepartmentAnalyticsResponse, EquipmentAnalyticsResponse
@@ -54,7 +54,6 @@ def get_overview(
     end: datetime | None = Query(default=None),
 ) -> AnalyticsOverview:
     actor = require_user(request)
-    require_roles(actor, Role.FACULTY, Role.ADMIN)
     window_start, window_end = _window(start, end)
     try:
         catalog = read_catalog(request.app.state)
@@ -81,7 +80,6 @@ def get_departments(
     end: datetime | None = Query(default=None),
 ) -> DepartmentAnalyticsResponse:
     actor = require_user(request)
-    require_roles(actor, Role.FACULTY, Role.ADMIN)
     window_start, window_end = _window(start, end)
     try:
         return build_departments(
@@ -106,7 +104,6 @@ def get_equipment_analytics(
     end: datetime | None = Query(default=None),
 ) -> EquipmentAnalyticsResponse:
     actor = require_user(request)
-    require_roles(actor, Role.FACULTY, Role.ADMIN)
     window_start, window_end = _window(start, end)
     try:
         return build_equipment(

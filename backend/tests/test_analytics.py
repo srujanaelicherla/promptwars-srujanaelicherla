@@ -19,8 +19,10 @@ def test_unauthorized_and_student_forbidden(client: TestClient) -> None:
         params={"start": SEED_START, "end": SEED_END},
         headers=STUDENT,
     )
-    assert anon.status_code == 401
-    assert student.status_code == 403
+    assert anon.status_code == 200
+    assert student.status_code == 200
+    assert anon.json()["demo"] is True
+    assert student.json()["demo"] is True
 
 
 def test_invalid_date_range(client: TestClient) -> None:

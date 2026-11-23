@@ -17,7 +17,6 @@ import {
 import { buttonClassName, cardClassName, secondaryButtonClassName, textLinkClassName } from "../utilities/classes";
 import { formatUtcRange } from "../utilities/bookableSlots";
 import { resourceKindLabel } from "../utilities/resourceKind";
-import { useAuth } from "../utilities/Auth";
 import { usePageTitle } from "../utilities/usePageTitle";
 
 export function BookingsPage() {
@@ -28,7 +27,6 @@ export function BookingsPage() {
   const [waitlistError, setWaitlistError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [cancelMessage, setCancelMessage] = useState<string | null>(null);
-  const { profile } = useAuth();
 
   function refresh(): void {
     listBookings()
@@ -51,7 +49,7 @@ export function BookingsPage() {
 
   useEffect(() => {
     refresh();
-  }, [profile?.id]);
+  }, []);
 
   const upcoming = (items ?? []).filter((item) => item.status === "approved" || item.status === "requested");
   const offers = (waitlist ?? []).filter((item) => item.status === "offered");
@@ -59,7 +57,7 @@ export function BookingsPage() {
   return (
     <AppShell title="My bookings">
       <p className="max-w-2xl leading-7 text-muted">
-        Upcoming bookings for your signed-in account. Cancel a time here to free it for others.
+        Upcoming bookings for the demo student on this API. Cancel a time here to free it for others.
       </p>
       {cancelMessage ? (
         <p className="mt-3 text-sm text-signal" role="status">

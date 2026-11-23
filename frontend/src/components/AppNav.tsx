@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router";
-import { useAuth } from "../utilities/Auth";
-import { navigationFor } from "../utilities/navigation";
+import { primaryNavigation } from "../utilities/navigation";
 import { SkipLink } from "./SkipLink";
 
 const navigationId = "primary-navigation";
@@ -15,8 +14,7 @@ const linkClass = ({ isActive }: { isActive: boolean }) =>
 export function AppNav() {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
-  const auth = useAuth();
-  const items = navigationFor(Boolean(auth.firebaseUser), auth.profile?.role ?? null);
+  const items = primaryNavigation;
 
   useEffect(() => {
     if (!menuOpen) {
@@ -76,11 +74,6 @@ export function AppNav() {
             {item.label}
           </NavLink>
         ))}
-        {auth.firebaseUser ? null : (
-          <NavLink to="/login" className={linkClass} onClick={() => setMenuOpen(false)}>
-            Sign in
-          </NavLink>
-        )}
       </nav>
     </div>
   );

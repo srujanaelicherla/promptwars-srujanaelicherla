@@ -50,7 +50,7 @@ def test_invalid_scheduling_input(client: TestClient) -> None:
     increment = client.post("/scheduling/recommendations", json=_body(increment_minutes=45), headers=STUDENT)
     duration = client.post("/scheduling/recommendations", json=_body(duration_minutes=20), headers=STUDENT)
     missing = client.post("/scheduling/recommendations", json=_body(equipment_id="eq-missing"), headers=STUDENT)
-    assert anon.status_code == 401
+    assert anon.status_code == 200
     assert naive.status_code == 422
     assert increment.status_code == 422
     assert duration.status_code == 422

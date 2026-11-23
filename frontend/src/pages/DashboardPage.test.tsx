@@ -1,7 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { afterEach, expect, test, vi } from "vitest";
-import { AuthProvider } from "../utilities/Auth";
 import { DashboardPage } from "./DashboardPage";
 
 const overview = {
@@ -92,11 +91,9 @@ test("dashboard renders API summary, unavailable utilization, and refetches on d
   globalThis.fetch = fetchMock as typeof fetch;
 
   render(
-    <AuthProvider>
-      <MemoryRouter>
-        <DashboardPage />
-      </MemoryRouter>
-    </AuthProvider>,
+    <MemoryRouter>
+      <DashboardPage />
+    </MemoryRouter>,
   );
 
   expect(screen.getByRole("status", { name: "Loading analytics" })).toBeInTheDocument();
@@ -116,11 +113,9 @@ test("dashboard shows API error", async () => {
   globalThis.fetch = vi.fn(async () => json({ error: "unavailable", message: "Analytics could not be loaded." }, 503)) as typeof fetch;
 
   render(
-    <AuthProvider>
-      <MemoryRouter>
-        <DashboardPage />
-      </MemoryRouter>
-    </AuthProvider>,
+    <MemoryRouter>
+      <DashboardPage />
+    </MemoryRouter>,
   );
 
   expect(await screen.findByRole("heading", { name: "Analytics unavailable" })).toBeInTheDocument();
@@ -174,11 +169,9 @@ test("dashboard empty occupancy and labeled date fields", async () => {
   }) as typeof fetch;
 
   render(
-    <AuthProvider>
-      <MemoryRouter>
-        <DashboardPage />
-      </MemoryRouter>
-    </AuthProvider>,
+    <MemoryRouter>
+      <DashboardPage />
+    </MemoryRouter>,
   );
 
   expect(await screen.findByRole("heading", { name: "No occupied time" })).toBeInTheDocument();

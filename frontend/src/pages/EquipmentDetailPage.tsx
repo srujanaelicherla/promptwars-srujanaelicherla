@@ -16,7 +16,6 @@ import {
 } from "../utilities/api";
 import { bookableSlots, formatUtcRange } from "../utilities/bookableSlots";
 import { buttonClassName, cardClassName, secondaryButtonClassName, textLinkClassName } from "../utilities/classes";
-import { useAuth } from "../utilities/Auth";
 import { defaultProjectId, departmentName, labName } from "../utilities/demoCatalog";
 import { resourceKind, resourceKindLabel } from "../utilities/resourceKind";
 import { usePageTitle } from "../utilities/usePageTitle";
@@ -40,11 +39,6 @@ export function EquipmentDetailPage() {
   const [bookingMessage, setBookingMessage] = useState<string | null>(null);
   const [bookingError, setBookingError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const auth = useAuth();
-  const signedIn = Boolean(auth.firebaseUser);
-  const role = auth.profile?.role ?? null;
-  const canBook = signedIn && (role === "student" || role === "admin");
-  const canRequest = signedIn && role === "student";
 
   usePageTitle(equipment ? `${equipment.name} · LabLink` : "Book · LabLink");
 
@@ -70,7 +64,7 @@ export function EquipmentDetailPage() {
   }, [equipmentId]);
 
   useEffect(() => {
-    if (!equipmentId || !date || !signedIn) {
+    if (!equipmentId || !date) {
       return;
     }
     let cancelled = false;
@@ -91,7 +85,7 @@ export function EquipmentDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [equipmentId, date, signedIn]);
+  }, [equipmentId, date]);
 
   const slots = useMemo(
     () => (availability ? bookableSlots(availability.available, duration) : []),
@@ -201,16 +195,6 @@ export function EquipmentDetailPage() {
           <li>Choose a free time</li>
           <li>Add an optional note and confirm</li>
         </ol>
-        {!signedIn ? (
-          <p className="mt-3 text-sm">
-            <Link className={textLinkClassName} to="/login">
-              Sign in to book
-            </Link>
-          </p>
-        ) : null}
-        {signedIn && !canBook && !restricted ? (
-          <p className="mt-3 text-sm text-muted">Booking is for student accounts. Faculty use review instead.</p>
-        ) : null}
         {!catalogOperational ? (
           <p className="mt-3 text-sm" role="status">
             This item is {equipment.status}, so it cannot be booked.
@@ -251,7 +235,7 @@ export function EquipmentDetailPage() {
           </label>
         </div>
 
-        {!signedIn ? null : availabilityError ? (
+        {availabilityError ? (
           <p className="mt-3 text-sm" role="alert">
             {availabilityError}
           </p>
@@ -313,7 +297,7 @@ export function EquipmentDetailPage() {
           <button
             className={`${buttonClassName} w-fit`}
             type="submit"
-            disabled={submitting || !selected || !catalogOperational || (restricted ? !canRequest : !canBook)}
+            disabled={submitting || !selected || !catalogOperational}
           >
             {submitting ? "Working…" : restricted ? "Request approval" : "Confirm booking"}
           </button>

@@ -1,4 +1,4 @@
-"""Server-side identity. Roles come from UserStore, never from the client."""
+"""Server-side identity. Browser requests use one local demo student."""
 
 from __future__ import annotations
 
@@ -16,6 +16,8 @@ logger = logging.getLogger("lablink")
 
 DEMO_USER_HEADER = "x-lablink-demo-user"
 TEST_TOKEN_PREFIX = "test:"
+DEMO_STUDENT_ID = "user-student-physics"
+DEMO_STUDENT = User(id=DEMO_STUDENT_ID, role=Role.STUDENT, department_id="dept-physics")
 
 
 class TokenVerifier(Protocol):
@@ -62,6 +64,11 @@ def _bearer_token(request: Request) -> str | None:
     return token
 
 
+def demo_student(users: UserStore) -> User:
+    found = users.get(DEMO_STUDENT_ID)
+    return found if found is not None else DEMO_STUDENT
+
+
 def _test_user(request: Request, users: UserStore) -> User:
     token = _bearer_token(request)
     if token is not None:
@@ -78,46 +85,24 @@ def _test_user(request: Request, users: UserStore) -> User:
         if user is None:
             raise BookingError(401, "unauthorized", "Unknown test identity.")
         return user
-    raise BookingError(401, "unauthorized", "Authentication is required.")
-
-
-def _firebase_user(request: Request, users: UserStore) -> User:
-    token = _bearer_token(request)
-    if token is None:
-        raise BookingError(401, "unauthorized", "Authentication is required.")
-    if token.count(".") != 2:
-        raise BookingError(401, "unauthorized", "The credential is malformed.")
-    verifier = getattr(request.app.state, "token_verifier", None)
-    if verifier is None:
-        raise BookingError(503, "request_failed", "Authentication is not configured.")
-    identity = verifier.verify(token)
-    user = users.get(identity["uid"])
-    if user is None:
-        raise BookingError(401, "unauthorized", "No LabLink profile exists for this account.")
-    return user
+    return demo_student(users)
 
 
 def verified_account_id(request: Request) -> str:
     """Return the verified account id without requiring a LabLink profile."""
 
     settings = read_settings(request.app.state)
-    if settings.auth_mode == "test":
-        token = _bearer_token(request)
-        if token is None or not token.startswith(TEST_TOKEN_PREFIX):
-            raise BookingError(401, "unauthorized", "Authentication is required.")
-        user_id = token[len(TEST_TOKEN_PREFIX) :].strip()
-        if user_id == "":
-            raise BookingError(401, "unauthorized", "The credential is malformed.")
-        return user_id
+    if settings.auth_mode != "test":
+        return DEMO_STUDENT_ID
     token = _bearer_token(request)
     if token is None:
-        raise BookingError(401, "unauthorized", "Authentication is required.")
-    if token.count(".") != 2:
+        return DEMO_STUDENT_ID
+    if not token.startswith(TEST_TOKEN_PREFIX):
+        raise BookingError(401, "unauthorized", "The credential is invalid.")
+    user_id = token[len(TEST_TOKEN_PREFIX) :].strip()
+    if user_id == "":
         raise BookingError(401, "unauthorized", "The credential is malformed.")
-    verifier = getattr(request.app.state, "token_verifier", None)
-    if verifier is None:
-        raise BookingError(503, "request_failed", "Authentication is not configured.")
-    return verifier.verify(token)["uid"]
+    return user_id
 
 
 def require_user(request: Request) -> User:
@@ -125,7 +110,7 @@ def require_user(request: Request) -> User:
     users = read_users(request.app.state)
     if settings.auth_mode == "test":
         return _test_user(request, users)
-    return _firebase_user(request, users)
+    return demo_student(users)
 
 
 def require_roles(user: User, *roles: Role) -> None:

@@ -12,12 +12,10 @@ import {
   type ConflictListResponse,
 } from "../utilities/api";
 import { buttonClassName, cardClassName } from "../utilities/classes";
-import { useAuth } from "../utilities/Auth";
 import { usePageTitle } from "../utilities/usePageTitle";
 
 export function FacultyReviewPage() {
   usePageTitle("Faculty review · LabLink");
-  const { profile } = useAuth();
   const [items, setItems] = useState<AccessRequestView[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -29,7 +27,7 @@ export function FacultyReviewPage() {
   const [conflicts, setConflicts] = useState<ConflictListResponse | null>(null);
   const [conflictError, setConflictError] = useState<string | null>(null);
 
-  const faculty = profile?.role === "faculty" || profile?.role === "admin";
+  const faculty = false;
 
   function load(): void {
     listAccessRequests()
@@ -46,7 +44,7 @@ export function FacultyReviewPage() {
 
   useEffect(() => {
     load();
-  }, [profile?.id]);
+  }, []);
 
   useEffect(() => {
     if (!faculty) {
@@ -62,7 +60,7 @@ export function FacultyReviewPage() {
         setConflictError(caught instanceof ApiError ? caught.message : "Conflicts could not be loaded.");
         setConflicts(null);
       });
-  }, [profile?.id, faculty, conflictEquipment]);
+  }, [faculty, conflictEquipment]);
 
   const selected = items?.find((item) => item.id === selectedId) ?? null;
   const pending = items?.filter((item) => item.status === "pending") ?? [];

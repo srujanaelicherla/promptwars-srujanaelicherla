@@ -1,16 +1,5 @@
 import { apiBaseUrl } from "./config";
 
-export const MISSING_PROFILE_MESSAGE = "No LabLink profile exists for this account.";
-export const SESSION_EXPIRED_MESSAGE = "The session has expired.";
-export const INVALID_CREDENTIAL_MESSAGE = "The credential is invalid.";
-export const MALFORMED_CREDENTIAL_MESSAGE = "The credential is malformed.";
-
-const CREDENTIAL_FAILURE_MESSAGES = new Set([
-  SESSION_EXPIRED_MESSAGE,
-  INVALID_CREDENTIAL_MESSAGE,
-  MALFORMED_CREDENTIAL_MESSAGE,
-]);
-
 export class ApiError extends Error {
   readonly status: number;
   readonly code: string;
@@ -24,38 +13,13 @@ export class ApiError extends Error {
   }
 }
 
-export function isMissingProfileError(error: unknown): boolean {
-  return error instanceof ApiError && error.status === 401 && error.message === MISSING_PROFILE_MESSAGE;
-}
-
-export function isCredentialFailure(error: unknown): boolean {
-  return (
-    error instanceof ApiError && error.status === 401 && CREDENTIAL_FAILURE_MESSAGES.has(error.message)
-  );
-}
-
-type TokenProvider = () => Promise<string | null>;
-
-let tokenProvider: TokenProvider | null = null;
-let unauthorizedHandler: (() => void) | null = null;
-
-export function setTokenProvider(provider: TokenProvider): void {
-  tokenProvider = provider;
-}
-
-export function setUnauthorizedHandler(handler: () => void): void {
-  unauthorizedHandler = handler;
-}
-
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   let response: Response;
-  const token = tokenProvider ? await tokenProvider() : null;
   try {
     response = await fetch(`${apiBaseUrl}${path}`, {
       ...init,
       headers: {
         Accept: "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(init?.body ? { "Content-Type": "application/json" } : {}),
         ...init?.headers,
       },
@@ -87,9 +51,6 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       } else {
         message = "Pick a start time on a 15-minute mark, with a length between 15 minutes and 8 hours.";
       }
-    }
-    if (response.status === 401 && CREDENTIAL_FAILURE_MESSAGES.has(message)) {
-      unauthorizedHandler?.();
     }
     throw new ApiError(response.status, body?.error ?? "request_failed", message, fields);
   }

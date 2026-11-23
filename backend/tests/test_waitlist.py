@@ -70,7 +70,8 @@ def test_waitlist_authz_and_own_list(client: TestClient) -> None:
     assert len(mine.json()["items"]) == 1
     assert mine.json()["items"][0]["id"] != theirs.json()["items"][0]["id"]
     assert "user-student-engineering" not in mine.text
-    assert anon.status_code == 401
+    assert anon.status_code == 200
+    assert len(anon.json()["items"]) == 1
     assert faculty_join.status_code == 403
 
 
@@ -160,7 +161,7 @@ def test_promotion_offer_hold_accept_and_idempotent(client: TestClient) -> None:
         json={"equipment_id": "eq-workbench"},
         headers=FACULTY_ENG,
     )
-    assert public.status_code == 401
+    assert public.status_code == 403
     assert student_promote.status_code == 403
     assert again.status_code == 200
     assert again.json()["idempotent"] is True

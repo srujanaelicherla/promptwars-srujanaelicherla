@@ -10,7 +10,6 @@ import {
   type AccessRequestView,
 } from "../utilities/api";
 import { buttonClassName, cardClassName } from "../utilities/classes";
-import { useAuth } from "../utilities/Auth";
 import { demoProjects } from "../utilities/demoCatalog";
 import { usePageTitle } from "../utilities/usePageTitle";
 
@@ -20,7 +19,6 @@ function localInputToIso(value: string): string {
 
 export function AccessRequestsPage() {
   usePageTitle("Access requests · LabLink");
-  const { profile } = useAuth();
   const [items, setItems] = useState<AccessRequestView[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [apiUser, setApiUser] = useState<string | null>(null);
@@ -50,7 +48,7 @@ export function AccessRequestsPage() {
 
   useEffect(() => {
     load();
-  }, [profile?.id]);
+  }, []);
 
   async function onSubmit(event: FormEvent): Promise<void> {
     event.preventDefault();
@@ -75,20 +73,16 @@ export function AccessRequestsPage() {
     }
   }
 
-  const studentView = profile?.role === "student";
-
   return (
     <AppShell title="Access requests">
       <p className="max-w-2xl leading-7 text-muted">
-        Role comes from the server profile
+        Requests are stored for the demo student
         {apiUser ? ` (${apiUser}` : ""}
-        {apiRole ? `, ${apiRole})` : apiUser ? ")" : ""}. The browser cannot send a privileged role.
-        Students see their own requests. Faculty see requests in their department. Approval is not a
-        booking until booking checks succeed.
+        {apiRole ? `, ${apiRole})` : apiUser ? ")" : ""}. Approval is not a booking until booking
+        checks succeed.
       </p>
 
-      {studentView ? (
-        <section className={`${cardClassName} mt-8`} aria-labelledby="submit-title">
+      <section className={`${cardClassName} mt-8`} aria-labelledby="submit-title">
           <h2 id="submit-title" className="font-display text-2xl text-primary">
             Submit an equipment access request
           </h2>
@@ -174,12 +168,7 @@ export function AccessRequestsPage() {
               {formError}
             </p>
           ) : null}
-        </section>
-      ) : (
-        <p className="mt-6 rounded-xl bg-aqua px-4 py-3 text-sm text-primary">
-          Student accounts submit requests here. Faculty review is on Faculty Review.
-        </p>
-      )}
+      </section>
 
       <section className="mt-8" aria-labelledby="list-title">
         <h2 id="list-title" className="font-display text-2xl text-primary">

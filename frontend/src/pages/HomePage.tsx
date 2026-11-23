@@ -57,8 +57,8 @@ export function HomePage() {
           <Link className={`${buttonClassName} bg-raised text-primary`} to="/equipment">
             Book a resource
           </Link>
-          <Link className={`${buttonClassName} bg-ink text-on-primary`} to="/dashboard">
-            Faculty dashboard
+          <Link className={`${buttonClassName} bg-ink text-on-primary`} to="/bookings">
+            My bookings
           </Link>
         </div>
       </section>
@@ -148,15 +148,12 @@ export function HomePage() {
           Faculty approvals
         </h2>
         <p className="mt-2 leading-7 text-muted">
-          Submit project access requests, inspect decisions, and compare competing requests. The
-          header session is issued by Firebase Authentication, not a client-supplied role.
+          Submit a project access request and inspect its stored status. Restricted items still need
+          a faculty decision on the API; this site does not sign in as faculty.
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
           <Link className={buttonClassName} to="/requests">
             Access requests
-          </Link>
-          <Link className={`${buttonClassName} bg-ink`} to="/faculty">
-            Faculty review
           </Link>
         </div>
       </section>

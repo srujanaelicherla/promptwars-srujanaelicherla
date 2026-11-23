@@ -29,7 +29,6 @@ from app.api.router import router
 from app.gemini import GeminiClient, api_key_from_env, load_gemini_key_from_file
 from app.rag import HashEmbedder, build_index
 from app.rate_limit import RateLimiter
-from app.authn import FirebaseTokenVerifier
 from app.bookings import BookingStore
 from app.config import Settings, load_settings
 from app.errors import register_error_handlers
@@ -46,7 +45,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     resolved = load_settings() if settings is None else settings
     application = FastAPI(
         title="LabLink API",
-        summary="Health, discovery, matching, bookings, faculty approvals, Firebase auth, Gemini assistant, scheduling, and analytics.",
+        summary="Health, discovery, matching, bookings, faculty approvals, Gemini assistant, scheduling, and analytics.",
         version="0.1.0",
         debug=False,
         docs_url=None,
@@ -62,17 +61,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     catalog = load_seed()
     firebase_ready = False
-    token_verifier = None
     production = os.environ.get("LABLINK_ENV", "").strip().casefold() == "production"
     if resolved.auth_mode == "firebase" or resolved.persistence == "firestore":
         firebase_ready = init_firebase(resolved)
-        if firebase_ready and resolved.auth_mode == "firebase":
-            token_verifier = FirebaseTokenVerifier()
         if production:
-            if resolved.auth_mode != "firebase" or token_verifier is None:
-                raise RuntimeError("Production requires Firebase token verification")
             if resolved.persistence != "firestore" or not firebase_ready:
-                raise RuntimeError("Production requires Firestore persistence")
+                raise RuntimeError("Production requires Firestore and Firebase Admin")
         if resolved.persistence == "firestore" and not firebase_ready:
             raise RuntimeError("Firestore persistence requires Firebase Admin")
         if firebase_ready and resolved.persistence == "firestore":
@@ -116,7 +110,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.state.settings = resolved
     application.state.catalog = catalog
     application.state.firebase_ready = firebase_ready
-    application.state.token_verifier = token_verifier
+    application.state.token_verifier = None
     if "pytest" not in sys.modules:
         load_gemini_key_from_file(Path(__file__).resolve().parent.parent / ".env")
     api_key = api_key_from_env()

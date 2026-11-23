@@ -46,7 +46,7 @@ def test_invalid_requests(client: TestClient) -> None:
     )
     unknown = client.post("/access-requests", json=_payload(equipment_id="eq-missing"), headers=STUDENT)
 
-    assert missing.status_code == 401
+    assert missing.status_code == 201
     assert faculty.status_code == 403
     assert past.status_code == 422
     assert unknown.status_code == 404
@@ -111,7 +111,7 @@ def test_unauthorized_and_missing_identity(client: TestClient) -> None:
     )
 
     assert as_student.status_code == 403
-    assert anonymous.status_code == 401
+    assert anonymous.status_code == 403
     assert unknown.status_code == 401
 
 

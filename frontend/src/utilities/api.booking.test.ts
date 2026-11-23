@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from "vitest";
-import { ApiError, createBooking, setTokenProvider } from "./api";
+import { ApiError, createBooking } from "./api";
 
 function json(body: unknown, status: number): Response {
   return new Response(JSON.stringify(body), {
@@ -10,7 +10,6 @@ function json(body: unknown, status: number): Response {
 
 afterEach(() => {
   vi.restoreAllMocks();
-  setTokenProvider(async () => null);
 });
 
 const slot = {
@@ -21,7 +20,6 @@ const slot = {
 };
 
 test("booking conflict keeps the API message instead of a reachability error", async () => {
-  setTokenProvider(async () => "aaa.bbb.ccc");
   globalThis.fetch = vi.fn(async () =>
     json({ error: "conflict", message: "This slot overlaps an existing booking." }, 409),
   ) as typeof fetch;
@@ -36,7 +34,6 @@ test("booking conflict keeps the API message instead of a reachability error", a
 });
 
 test("restricted and maintenance errors keep their API messages", async () => {
-  setTokenProvider(async () => "aaa.bbb.ccc");
   globalThis.fetch = vi.fn(async () =>
     json({ error: "unavailable", message: "This equipment is not operational." }, 409),
   ) as typeof fetch;
@@ -48,7 +45,6 @@ test("restricted and maintenance errors keep their API messages", async () => {
 });
 
 test("a dropped connection is the only reachability error", async () => {
-  setTokenProvider(async () => "aaa.bbb.ccc");
   globalThis.fetch = vi.fn(async () => {
     throw new TypeError("Failed to fetch");
   }) as typeof fetch;

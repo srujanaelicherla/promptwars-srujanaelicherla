@@ -9,7 +9,6 @@ import {
   type AssistantQueryResponse,
   type CitationView,
 } from "../utilities/api";
-import { useAuth } from "../utilities/Auth";
 import { buttonClassName, cardClassName, secondaryButtonClassName, textLinkClassName } from "../utilities/classes";
 import { usePageTitle } from "../utilities/usePageTitle";
 
@@ -31,19 +30,12 @@ function citationLabel(item: CitationView): string {
 
 export function AssistantPage() {
   usePageTitle("LabLink AI Assistant · LabLink");
-  const auth = useAuth();
   const questionId = useId();
   const [question, setQuestion] = useState("");
   const [thread, setThread] = useState<ThreadItem[]>([]);
   const [asking, setAsking] = useState(false);
   const [askError, setAskError] = useState<string | null>(null);
   const [unavailable, setUnavailable] = useState(false);
-
-  const signedIn = Boolean(auth.firebaseUser);
-  const needsProfile = signedIn && auth.needsProfile;
-  const formsDisabled = !signedIn || asking;
-  const profileBlockMessage =
-    "Finish the student profile form above. The assistant cannot answer until a LabLink profile exists.";
 
   function markUnavailable(caught: unknown): void {
     if (caught instanceof ApiError && (caught.status === 503 || caught.code === "unavailable")) {
@@ -53,11 +45,7 @@ export function AssistantPage() {
 
   async function runQuestion(text: string): Promise<void> {
     const trimmed = text.trim();
-    if (!signedIn || trimmed.length < 4) {
-      return;
-    }
-    if (needsProfile) {
-      setAskError(profileBlockMessage);
+    if (trimmed.length < 4) {
       return;
     }
     setAsking(true);
@@ -93,11 +81,7 @@ export function AssistantPage() {
   function onAsk(event: FormEvent): void {
     event.preventDefault();
     const trimmed = question.trim();
-    if (!signedIn || trimmed.length < 4) {
-      return;
-    }
-    if (needsProfile) {
-      setAskError(profileBlockMessage);
+    if (trimmed.length < 4) {
       return;
     }
     setQuestion("");
@@ -111,25 +95,6 @@ export function AssistantPage() {
         The assistant cannot approve requests or create bookings, and it does not invent live
         availability.
       </p>
-
-      {!signedIn ? (
-        <div className="mt-6">
-          <ErrorState
-            title="Sign in required"
-            message="LabLink AI Assistant uses authenticated API routes. Sign in to ask questions. Example questions below are prompts only; answers come from the API."
-          >
-            <Link className={buttonClassName} to="/login">
-              Sign in
-            </Link>
-          </ErrorState>
-        </div>
-      ) : null}
-
-      {needsProfile ? (
-        <div className="mt-6">
-          <ErrorState title="Student profile required" message={profileBlockMessage} />
-        </div>
-      ) : null}
 
       {unavailable ? (
         <div className="mt-6">
@@ -150,7 +115,7 @@ export function AssistantPage() {
               <button
                 type="button"
                 className={`${secondaryButtonClassName} w-full justify-start text-left`}
-                disabled={formsDisabled}
+                disabled={asking}
                 onClick={() => {
                   void runQuestion(item);
                 }}
@@ -173,10 +138,10 @@ export function AssistantPage() {
           onChange={(event) => {
             setQuestion(event.target.value);
           }}
-          disabled={formsDisabled}
+          disabled={asking}
           maxLength={2000}
         />
-        <button className={buttonClassName} type="submit" disabled={formsDisabled || question.trim().length < 4}>
+        <button className={buttonClassName} type="submit" disabled={asking || question.trim().length < 4}>
           Send question
         </button>
       </form>

@@ -2,11 +2,6 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { App } from "./App";
 
-vi.mock("./utilities/firebase", () => ({
-  firebaseConfigured: () => false,
-  getFirebaseAuth: () => null,
-}));
-
 beforeEach(() => {
   window.history.replaceState({}, "", "/");
   globalThis.fetch = vi.fn(async () =>
@@ -35,12 +30,14 @@ test("renders the application shell with working navigation", () => {
   expect(screen.getByRole("navigation", { name: "Primary" })).toBeInTheDocument();
   expect(screen.getByRole("link", { name: "Skip to content" })).toBeInTheDocument();
   expect(screen.getByRole("link", { name: "Book" })).toHaveAttribute("href", "/equipment");
-  expect(screen.getByRole("link", { name: "Faculty dashboard" })).toHaveAttribute("href", "/dashboard");
-  expect(screen.queryByRole("link", { name: "Dashboard" })).not.toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "My Bookings" })).toHaveAttribute("href", "/bookings");
+  expect(screen.getByRole("link", { name: "Access Requests" })).toHaveAttribute("href", "/requests");
   expect(screen.getByRole("link", { name: "Project Matching" })).toHaveAttribute("href", "/matching");
   expect(screen.getByRole("link", { name: "AI Assistant" })).toHaveAttribute("href", "/assistant");
   expect(screen.getByRole("link", { name: "Open AI Assistant" })).toHaveAttribute("href", "/assistant");
-  expect(screen.getAllByRole("link", { name: "Sign in" })[0]).toHaveAttribute("href", "/login");
+  expect(screen.queryByRole("link", { name: "Sign in" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("link", { name: "Dashboard" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("link", { name: "Faculty dashboard" })).not.toBeInTheDocument();
   expect(screen.queryByRole("link", { name: "Faculty Review" })).not.toBeInTheDocument();
   expect(screen.getByText("Synthetic catalog")).toBeInTheDocument();
 });
@@ -62,11 +59,12 @@ test("menu button exposes and dismisses the navigation disclosure", () => {
   expect(menu).toHaveFocus();
 });
 
-test("dashboard route requires sign in", () => {
+test("dashboard route is not a faculty sign-in wall", () => {
   window.history.pushState({}, "", "/dashboard");
   render(<App />);
 
-  expect(screen.getByRole("heading", { level: 1, name: "Sign in" })).toBeInTheDocument();
+  expect(screen.getByRole("heading", { level: 1, name: "Page not found" })).toBeInTheDocument();
+  expect(screen.queryByRole("heading", { name: "Sign in" })).not.toBeInTheDocument();
 });
 
 test("unknown addresses render a not-found page", () => {

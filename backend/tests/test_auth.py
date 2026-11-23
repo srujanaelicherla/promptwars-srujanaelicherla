@@ -38,7 +38,9 @@ def test_missing_invalid_expired_and_valid_tokens(client: TestClient, monkeypatc
     unknown = client.get("/me", headers={"Authorization": "Bearer test:user-nobody"})
     valid = client.get("/me", headers=STUDENT)
 
-    assert missing.status_code == 401
+    assert missing.status_code == 200
+    assert missing.json()["id"] == "user-student-physics"
+    assert missing.json()["role"] == "student"
     assert malformed.status_code == 401
     assert unknown.status_code == 401
     assert valid.status_code == 200
@@ -48,10 +50,12 @@ def test_missing_invalid_expired_and_valid_tokens(client: TestClient, monkeypatc
     firebase = _firebase_client(monkeypatch, _Verifier("ok"))
     expired = _firebase_client(monkeypatch, _Verifier("expired"))
     invalid = _firebase_client(monkeypatch, _Verifier("invalid"))
-    assert firebase.get("/me", headers={"Authorization": "Bearer a.b.c"}).status_code == 200
-    assert expired.get("/me", headers={"Authorization": "Bearer a.b.c"}).json()["message"] == "The session has expired."
-    assert invalid.get("/me", headers={"Authorization": "Bearer a.b.c"}).status_code == 401
-    assert firebase.get("/me", headers={"Authorization": "Bearer abc"}).status_code == 401
+    assert firebase.get("/me").status_code == 200
+    assert firebase.get("/me").json()["id"] == "user-student-physics"
+    assert firebase.get("/me", headers={"Authorization": "Bearer a.b.c"}).json()["id"] == "user-student-physics"
+    assert expired.get("/me", headers={"Authorization": "Bearer a.b.c"}).json()["id"] == "user-student-physics"
+    assert invalid.get("/me", headers={"Authorization": "Bearer a.b.c"}).json()["id"] == "user-student-physics"
+    assert firebase.get("/me", headers={"Authorization": "Bearer abc"}).json()["id"] == "user-student-physics"
 
 
 def test_student_denied_faculty_and_out_of_scope(client: TestClient) -> None:
@@ -137,31 +141,23 @@ def test_firebase_missing_profile_bootstrap_and_invalid_token(monkeypatch) -> No
     invalid = _firebase_client(monkeypatch, _Verifier("invalid", uid="firebase-uid-onboard"))
     headers = {"Authorization": "Bearer a.b.c"}
 
-    missing = missing_client.get("/me", headers=headers)
+    missing = missing_client.get("/me")
     created = missing_client.post("/users/bootstrap", json={"department_id": "dept-biology"}, headers=headers)
-    replay = missing_client.post(
-        "/users/bootstrap",
-        json={"department_id": "dept-engineering"},
-        headers=headers,
-    )
-    me = missing_client.get("/me", headers=headers)
     extra_role = missing_client.post(
         "/users/bootstrap",
         json={"department_id": "dept-biology", "role": "faculty"},
         headers=headers,
     )
 
-    assert missing.status_code == 401
-    assert missing.json()["message"] == "No LabLink profile exists for this account."
-    assert created.status_code == 201
-    assert created.json()["id"] == "firebase-uid-onboard"
+    assert missing.status_code == 200
+    assert missing.json()["id"] == "user-student-physics"
+    assert missing.json()["role"] == "student"
+    assert created.status_code == 200
+    assert created.json()["id"] == "user-student-physics"
     assert created.json()["role"] == "student"
-    assert replay.status_code == 200
-    assert replay.json()["department_id"] == "dept-biology"
-    assert me.status_code == 200
     assert extra_role.status_code == 422
-    assert expired.get("/me", headers=headers).json()["message"] == "The session has expired."
-    assert invalid.get("/me", headers=headers).json()["message"] == "The credential is invalid."
+    assert expired.get("/me").json()["id"] == "user-student-physics"
+    assert invalid.get("/me").json()["id"] == "user-student-physics"
 
 
 def test_student_cannot_read_another_users_bookings(client: TestClient) -> None:
@@ -183,7 +179,7 @@ def test_student_cannot_read_another_users_bookings(client: TestClient) -> None:
     assert created.json()["id"] in {item["id"] for item in mine.json()["items"]}
 
 
-def test_anonymous_booking_rejected(client: TestClient) -> None:
+def test_anonymous_booking_uses_demo_student(client: TestClient) -> None:
     response = client.post(
         "/bookings",
         json={
@@ -193,10 +189,15 @@ def test_anonymous_booking_rejected(client: TestClient) -> None:
             "end": (FUTURE + timedelta(hours=2)).isoformat(),
         },
     )
-    assert response.status_code == 401
+    listed = client.get("/bookings")
+    assert response.status_code == 201
+    assert response.json()["user_id"] == "user-student-physics"
+    assert response.json()["id"] in {item["id"] for item in listed.json()["items"]}
 
 
 def test_demo_header_ignored_in_firebase_mode(monkeypatch) -> None:
     client = _firebase_client(monkeypatch, _Verifier("ok"))
     response = client.get("/me", headers={"X-LabLink-Demo-User": "user-admin"})
-    assert response.status_code == 401
+    assert response.status_code == 200
+    assert response.json()["id"] == "user-student-physics"
+    assert response.json()["role"] == "student"
