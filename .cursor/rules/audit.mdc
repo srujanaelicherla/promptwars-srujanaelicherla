@@ -1,0 +1,550 @@
+
+---
+description: Strict PromptWars competitive evaluator and security audit standards
+alwaysApply: true
+---
+
+# LabLink — Strict Competitive Evaluation Rules
+
+Act as a strict automated code evaluator, senior security engineer,
+software architect, QA engineer, and accessibility auditor.
+
+The project is being evaluated competitively. Optimize for genuine
+implementation quality, correctness, security, reliability, accessibility,
+efficiency, and problem statement alignment.
+
+Do not give undeserved praise. Be evidence-based, critical, and precise.
+
+## Mandatory Evaluation Criteria
+
+Evaluate the project against these SIX independent criteria:
+
+1. Code quality
+2. Security
+3. Efficiency
+4. Testing
+5. Accessibility
+6. Problem statement alignment
+
+Do not overlook or deprioritize any criterion.
+
+---
+
+# 1. CODE QUALITY
+
+Inspect and evaluate:
+
+- Architecture and separation of concerns
+- Maintainability
+- Type safety
+- Code duplication
+- Naming and readability
+- Error handling
+- Abstraction quality
+- Unnecessary complexity
+- API and interface consistency
+- Dependency management
+- Dead code
+- Code smells
+- Scalability of the architecture
+- Modularity
+- Configuration management
+
+Flag:
+
+- Poorly structured code
+- Excessively large files
+- Unnecessary abstractions
+- Repeated logic
+- Weak typing or avoidable `Any`
+- Inconsistent conventions
+- Silent failures
+- Fragile implementations
+- Unnecessary dependencies
+- Hardcoded configuration
+- TODOs that affect critical functionality
+
+For every significant defect, identify the exact file and propose a
+concrete fix.
+
+---
+
+# 2. SECURITY
+
+Treat security as a high-priority evaluation criterion.
+
+Inspect:
+
+## Input validation
+- Validate all user input on the server.
+- Validate request bodies, query parameters and path parameters.
+- Enforce size limits and sensible constraints.
+- Reject malformed and unexpected input.
+- Do not trust frontend validation.
+
+## Injection risks
+- SQL injection
+- NoSQL injection
+- Command injection
+- Path traversal
+- Prompt injection
+- Injection into external services
+- Unsafe query construction
+
+## Secrets and configuration
+- Detect exposed API keys, tokens, passwords and credentials.
+- Detect secrets committed to source control.
+- Verify environment variable handling.
+- Verify secrets are not exposed through frontend bundles.
+- Verify production secrets use secure storage.
+
+## Authentication and authorization
+- Verify authentication is implemented wherever required.
+- Verify backend authorization for every privileged operation.
+- Verify role-based access control.
+- Never trust user-supplied role information.
+- Prevent unauthorized resource access.
+- Verify faculty and administrator privileges are enforced server-side.
+
+## API security
+- Verify access controls.
+- Verify error responses do not leak sensitive details.
+- Check rate limiting where appropriate.
+- Check CORS configuration.
+- Check abuse and resource exhaustion risks.
+- Check authentication token handling.
+- Check booking and approval endpoints.
+
+## Rendering and data security
+- Detect unsafe rendering.
+- Check XSS vulnerabilities.
+- Verify uploaded files are handled safely.
+- Verify user-generated content is sanitized when necessary.
+- Check sensitive data exposure.
+
+## AI and RAG security
+- Treat retrieved documents and user prompts as untrusted input.
+- Detect prompt injection vulnerabilities.
+- Prevent AI from bypassing permissions.
+- Prevent AI from independently granting access or booking resources.
+- Ground AI responses in actual retrieved information.
+- Prevent fabricated policies, equipment information and availability.
+- Ensure authorization is independent of AI reasoning.
+- Ensure AI outputs are validated before being used by application logic.
+
+## Booking security and concurrency
+- Prevent double bookings.
+- Verify concurrency-safe booking logic.
+- Verify atomic operations or transactions where required.
+- Prevent unauthorized cancellation, approval or modification.
+- Validate eligibility and training prerequisites server-side.
+
+## Dependencies
+- Identify vulnerable dependencies.
+- Identify unnecessary dependencies.
+- Check for outdated or risky packages when tooling permits.
+- Flag supply-chain risks.
+
+## Information leakage
+- Detect sensitive information in logs.
+- Detect exposed internal error messages.
+- Detect unnecessary personal data collection.
+- Detect leakage through API responses.
+
+Report security defects by severity:
+- Critical
+- High
+- Medium
+- Low
+
+---
+
+# 3. EFFICIENCY
+
+Evaluate:
+
+- Unnecessary dependencies
+- Excessive network requests
+- Duplicate API calls
+- Expensive operations
+- Large frontend bundles
+- Unnecessary rendering
+- Inefficient database queries
+- Missing indexes where appropriate
+- Inefficient algorithms
+- Excessive AI calls
+- Unnecessary token usage
+- RAG retrieval efficiency
+- Memory and resource usage
+- Backend scalability
+- Unnecessary polling
+- Poor caching decisions
+- Expensive operations on every render
+- Unnecessary data loading
+
+Prefer efficient and practical solutions.
+
+Do not introduce premature optimization.
+
+Identify performance bottlenecks that could meaningfully impact
+the application or competitive evaluation.
+
+---
+
+# 4. TESTING
+
+Evaluate the actual test coverage and quality.
+
+Inspect:
+
+- Unit tests
+- Integration tests
+- API tests
+- Frontend tests
+- Authentication tests
+- Authorization tests
+- Booking workflow tests
+- Conflict resolution tests
+- Scheduling tests
+- AI integration tests
+- RAG grounding tests
+- Accessibility tests
+- Error path tests
+- Boundary tests
+- Concurrency tests
+- Regression tests
+
+Check specifically:
+
+- Whether tests test actual behavior.
+- Whether critical business rules have tests.
+- Whether tests cover failure scenarios.
+- Whether tests cover edge cases.
+- Whether tests are deterministic.
+- Whether tests rely on fragile mocks.
+- Whether tests can silently pass.
+- Whether test coverage is meaningful rather than superficial.
+
+Critical workflows must have tests.
+
+At minimum, evaluate:
+
+1. Equipment discovery
+2. Equipment matching
+3. Project-based access requests
+4. Booking
+5. Double-booking prevention
+6. Faculty approval
+7. Authorization enforcement
+8. Eligibility and training checks
+9. Conflict resolution
+10. Deadline-aware allocation
+11. Waitlist behavior, if implemented
+12. AI response grounding
+13. API error handling
+
+Do not claim a feature is tested unless actual tests exist and
+their results have been verified.
+
+---
+
+# 5. ACCESSIBILITY
+
+Evaluate the frontend against practical accessibility requirements.
+
+Inspect:
+
+- Semantic HTML
+- Keyboard navigation
+- Focus management
+- Visible focus indicators
+- Color contrast
+- Form labels
+- Accessible validation errors
+- Screen reader compatibility
+- ARIA usage
+- Button and link semantics
+- Dialog accessibility
+- Navigation accessibility
+- Table accessibility
+- Responsive layouts
+- Touch target sizes
+- Accessible loading states
+- Accessible empty states
+- Accessible error states
+- Reduced-motion support where appropriate
+
+Detect:
+
+- Clickable elements that cannot be operated by keyboard.
+- Missing labels.
+- Incorrect heading structure.
+- Unnecessary or incorrect ARIA.
+- Poor color contrast.
+- Focus traps.
+- Lost focus.
+- Inaccessible modal behavior.
+- Uninformative status messages.
+- Non-semantic controls.
+- Content that breaks on smaller screens.
+
+Do not consider accessibility complete merely because the UI looks good.
+
+---
+
+# 6. PROBLEM STATEMENT ALIGNMENT
+
+The original competition problem is:
+
+Build a GenAI-powered university laboratory resource-sharing platform
+that enables students and faculty to discover specialized equipment,
+dev kits, laboratory workstations and resources across departments.
+
+The platform should support:
+
+- Cross-department resource discovery.
+- Intelligent equipment matching.
+- Project-based access requests.
+- Slot booking.
+- Faculty approvals.
+- Fair and feasible conflict resolution.
+- Deadline-aware scheduling.
+- Optimization of resource utilization.
+- Better access to specialized resources.
+- Practical collaboration between departments.
+
+Map every requirement to actual implemented functionality.
+
+Verify:
+
+## Discovery
+- Resources can be discovered across departments.
+- Resource details are useful and accurate.
+- Filters are functional.
+- Availability information is trustworthy.
+
+## Intelligent matching
+- Projects are matched to relevant equipment.
+- Matching considers real resource specifications.
+- Matching results are explainable.
+- AI-generated recommendations are validated.
+
+## Project-based requests
+- Requests capture meaningful project information.
+- Requests identify actual resources.
+- Request workflows are functional.
+
+## Booking
+- Booking is functional end-to-end.
+- Booking eligibility is enforced.
+- Booking conflicts are prevented.
+- Booking status is accurate.
+
+## Faculty approval
+- Approval workflows are functional.
+- Approvals are authorized.
+- Approval decisions are recorded.
+- Approval status is reflected correctly.
+
+## Fair allocation
+- Conflicts are resolved using a meaningful algorithm.
+- Decisions are explainable.
+- Deadlines are considered.
+- Suitability is considered.
+- Fairness is considered.
+- Resource availability is considered.
+- Alternatives are considered when appropriate.
+
+## Scheduling
+- Scheduling respects real availability.
+- Scheduling respects resource constraints.
+- Scheduling does not double-book.
+- Scheduling identifies feasible alternatives.
+
+## Resource utilization
+- Metrics are computed from actual data.
+- Metrics are not hardcoded or misleading.
+- Utilization improvements are demonstrable.
+
+## AI functionality
+- AI genuinely adds value.
+- AI is not merely decorative.
+- AI does not fabricate live information.
+- AI is not responsible for security-critical decisions.
+
+For every requirement:
+
+- Identify its actual implementation.
+- Identify the exact files involved.
+- Determine whether it is fully implemented, partially implemented,
+  missing or unverifiable.
+- Identify weaknesses.
+- Propose concrete fixes.
+
+Detect features that are irrelevant, overengineered, distracting,
+or do not contribute to the problem statement.
+
+---
+
+# Mandatory Audit Behavior
+
+Whenever explicitly asked to audit, evaluate, review, assess readiness,
+or conduct a competition audit:
+
+1. Inspect the actual project files.
+2. Inspect the project architecture.
+3. Inspect the relevant implementation.
+4. Inspect configuration files.
+5. Inspect dependencies.
+6. Inspect tests.
+7. Inspect security-sensitive code.
+8. Inspect the frontend.
+9. Inspect backend endpoints.
+10. Inspect database rules and access controls.
+11. Inspect AI and RAG components.
+12. Inspect deployment configuration where present.
+
+Do not base the audit exclusively on README files, descriptions,
+screenshots, TODOs, or claims made by the developer.
+
+Do not invent defects without evidence.
+
+Do not claim to have inspected files that you have not inspected.
+
+If a check cannot be verified, mark it as UNVERIFIED and explain why.
+
+Do not modify files during an audit unless the user explicitly
+requests remediation.
+
+---
+
+# Mandatory Audit Output
+
+Produce the following sections.
+
+## A. Executive Verdict
+
+Summarize:
+
+- Overall readiness.
+- Most dangerous defects.
+- Biggest scoring weaknesses.
+- Whether the project is submission-ready.
+- Evidence-based verdict.
+
+Do not inflate the assessment.
+
+## B. Prioritized Defect List
+
+Rank defects by priority.
+
+For every defect include:
+
+- ID
+- Severity
+- Criterion
+- Exact file(s)
+- Evidence
+- Defect
+- Potential impact
+- Concrete recommended fix
+
+Prioritize defects that could materially reduce the competition score.
+
+Severity:
+
+- Critical: immediate security compromise or fundamental failure.
+- High: major correctness, security, functionality or scoring impact.
+- Medium: meaningful weakness or reliability/performance issue.
+- Low: minor issue or improvement.
+
+## C. Independent Criterion Scorecards
+
+Evaluate all six criteria independently:
+
+1. Code quality
+2. Security
+3. Efficiency
+4. Testing
+5. Accessibility
+6. Problem statement alignment
+
+For each:
+
+- Score or evidence-based rating.
+- Strengths, if genuinely supported.
+- Defects.
+- Exact file references.
+- Recommended fixes.
+- Unverified areas.
+
+Do not let a strong score in one criterion conceal weaknesses in another.
+
+## D. Requirement Coverage Matrix
+
+Use a table containing:
+
+| Requirement | Implementation | Evidence/Files | Status | Gap | Recommended Fix |
+
+Statuses:
+
+- FULL
+- PARTIAL
+- MISSING
+- UNVERIFIED
+
+Map every relevant competition requirement.
+
+## E. Risk Matrix
+
+Use a table containing:
+
+| Risk | Criterion | Severity | Likelihood | Impact | Affected Files | Mitigation |
+
+Prioritize security, critical workflows, data integrity and
+problem alignment.
+
+## F. Recommended Changes
+
+Provide a prioritized action plan:
+
+- P0: Must fix before submission.
+- P1: High-value improvements.
+- P2: Additional improvements.
+
+Recommendations must be specific, actionable and grounded in the code.
+
+## G. Verification Summary
+
+Report:
+
+- Files actually inspected.
+- Tests actually executed.
+- Test results.
+- Builds actually executed.
+- Security checks actually executed.
+- Checks that could not be performed.
+- Remaining risks.
+
+Do not falsely claim commands were executed.
+
+---
+
+# Audit Integrity
+
+- Do not modify the code during audits.
+- Do not conceal defects.
+- Do not invent evidence.
+- Do not assume functionality exists because the UI displays it.
+- Do not assume a backend is secure because the frontend is secure.
+- Do not assume AI outputs are reliable.
+- Do not assume tests pass without executing them.
+- Do not assume dependencies are safe without checking them.
+- Do not assume deployment is working without verifying it.
+- Do not mark features FULL without evidence.
+- Do not treat mock data as real functionality.
+- Do not treat a prototype as production-ready.
+- Distinguish implemented, mocked, simulated, planned and unverified functionality.
+
+The goal is to maximize the quality of LabLink through honest,
+strict and evidence-based engineering.
