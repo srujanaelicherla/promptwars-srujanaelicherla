@@ -1,0 +1,103 @@
+
+---
+description: LabLink PromptWars engineering and evaluation rules
+alwaysApply: true
+---
+
+# LabLink Competition Engineering Rules
+
+Build LabLink, an AI-powered university laboratory resource-sharing platform.
+
+The platform must support:
+- Cross-department equipment discovery
+- Intelligent equipment matching
+- Project-based access requests
+- Slot booking
+- Faculty approvals
+- Fair conflict resolution
+- Deadline-aware scheduling
+- Resource utilization optimization
+
+## Architecture
+
+Frontend:
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+
+Backend:
+- Python
+- FastAPI
+- Google Cloud Run
+
+Data:
+- Firebase Authentication
+- Cloud Firestore
+
+AI:
+- Gemini for project understanding and conversational reasoning
+- RAG for manuals, equipment documents and safety policies
+- Live structured data must be used for availability and booking
+
+Google Cloud:
+- Cloud Run
+- Firebase
+- Cloud Storage where required
+- Secret Manager where required
+
+## Critical rules
+
+- Do not use AI to make final booking or access-control decisions.
+- Deterministic code must enforce eligibility and availability.
+- Use transactions or equivalent concurrency-safe mechanisms for booking.
+- Never double-book resources.
+- Never expose secrets in frontend code.
+- Never trust client-provided user roles.
+- Validate all inputs.
+- Enforce authorization on the backend.
+- Use grounded citations for RAG responses.
+- Never fabricate equipment, policies, availability or approval status.
+- Prevent booking restricted equipment without verified prerequisites.
+- Explain fairness-based allocation decisions.
+- Keep faculty approval in the loop for contested or restricted requests.
+
+## Quality
+
+- Maintainable code.
+- Typed interfaces.
+- Minimal dependencies.
+- Proper error handling.
+- Unit tests.
+- Integration tests for booking and scheduling.
+- Accessibility.
+- Responsive design.
+- No dead buttons.
+- No fake functionality.
+- No hardcoded metrics that pretend to be live.
+- No unnecessary features.
+
+## Competition constraints
+
+- Public repository.
+- Exactly one branch.
+- Repository under 10 MB.
+- Cloud Run deployment.
+- Publicly accessible deployment.
+- No secrets in GitHub.
+- Clean README.
+- Verify production before submission.
+
+## Development workflow
+
+- Read and understand all requirements.
+- Plan architecture before implementation.
+- Implement core functionality first.
+- Test all critical flows.
+- Audit all six scoring criteria.
+- Deploy.
+- Test production.
+- Only then prepare submission.
+
+Do not overengineer.
+Prioritize a complete, reliable, demonstrable solution.

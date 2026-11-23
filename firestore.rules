@@ -1,0 +1,54 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Catalog is readable to signed-in users. All writes go through the backend Admin SDK.
+    match /departments/{id} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+    match /labs/{id} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+    match /equipment/{id} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+    match /projects/{id} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    match /users/{userId} {
+      allow read: if signedIn() && request.auth.uid == userId;
+      allow write: if false;
+    }
+
+    // Sensitive mutations are backend-only.
+    match /bookings/{id} {
+      allow read, write: if false;
+    }
+    match /access_requests/{id} {
+      allow read, write: if false;
+    }
+    match /approvals/{id} {
+      allow read, write: if false;
+    }
+    match /allocation_decisions/{id} {
+      allow read, write: if false;
+    }
+    match /slot_locks/{id} {
+      allow read, write: if false;
+    }
+    match /waitlist/{id} {
+      allow read, write: if false;
+    }
+    match /offers/{id} {
+      allow read, write: if false;
+    }
+  }
+}

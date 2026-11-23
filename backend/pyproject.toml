@@ -1,0 +1,33 @@
+[project]
+name = "lablink-backend"
+version = "0.1.0"
+description = "LabLink Phase 1 API foundation"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi==0.165.0",
+  "pydantic==2.14.4",
+  "uvicorn==0.54.0",
+  "firebase-admin==7.1.0",
+  "google-genai==1.52.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "httpx==0.28.1",
+  "pytest==9.2.0",
+]
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.setuptools.package-data]
+app = ["ai_corpus/*.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = ["firestore_emulator: requires a running Firestore emulator"]
